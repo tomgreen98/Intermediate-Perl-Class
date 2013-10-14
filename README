@@ -3,3 +3,131 @@ Notes:
 Instructor:  brian d foy
 Version:     3.1
 Date:        10/14/2013
+
+perldoc perlvar
+
+perldoc -f eval
+
+perldoc -q comma
+
+perldoc perlop
+
+http:://perldoc.perl.com
+
+
+-------------------------------------------
+Review of grep:
+-------------------------------------------
+
+my @numbers = 1..1000;
+my @odd_numbers;
+foreach (@numbers) {
+	push @odd_numbers, $_ if $_ % 2;
+}
+
+or
+
+my @odd_numbers = grep $_ % 2, 1..1000;
+
+my @result = grep expression, list;
+
+As in foreach $_ is aliased to the elements of the original list, careful, don't change $_ unless you intend to change the original list.
+
+also:
+
+my @matching = grep /\bMinow\b/, <FILE>;  # gets the matching lines
+
+
+Perl Power Tools - adds perl implemenations of grep and other linux stuff to Windows. COOL ***
+
+-------------------------------------------
+Review of map:
+-------------------------------------------
+
+my @foods = qw/ COCONUTS Rice mangoes Wild_boar /;
+my @good_case;
+foreach (@foods) {
+	push @good_case, "\u\L$_";
+}
+
+or
+
+my @good_case = map "\u\L$_", @foods;
+
+Can be used inline.
+
+print "The foods are:\n", map " $_\n", @good_case;
+
+Its all list processing. Just like the linux pipeline.
+Called the UNIX toolbox.
+LISP - also very good at this...
+
+Higher Order Perl - Mark Jas
+Perl has 6 of the 7 things that define LISP.
+
+Case Shifters in string interpretation.
+
+Call a subroutine:
+
+my @files &funct($_), glob "*";
+my @strings = map &funct($_), <FILE>;
+
+-------------------------------------------
+Annomyous subroutine:
+-------------------------------------------
+my @strings = map {
+	my $copy = $_;
+	$copy =~ s/^\s+//;
+
+	$copy; # return
+} <FILE>
+
+
+($new = $orig) =~ s///;
+
+$new = $orig =~ s///r;  # 5.14 /r returns results instead of count.
+
+@out = map { s/// } @in; # array of counts substitute
+@out = map { s///r } @in; # array of strings with substitutes.
+
+-------------------------------------------
+Mapping one to many:
+-------------------------------------------
+my @file_names = glob "*";
+my @names_and_sizes = map { $_, -s } @file_names;
+my %size_of = @names_and_sizes;
+
+# Shorter version
+my %size_of = map { $_, -s } glob "*";
+
+my @words = map split, <FILE>; # splits the whole file into words.
+
+my @comments = map /#\s*(.*)/, <INPUT>;  # a list of # comments
+
+-------------------------------------------
+Review of eval:
+-------------------------------------------
+String form - bad one, genearally execute string as perl code.
+
+Block form -
+
+eval {
+	open FH, $file or die "This is caught in $@";
+	some_sub_that_dies(); #This is caught too
+}
+if ($@) {
+	...
+}
+
+Does not trap normal execution, such as exit or warnings.
+The code in the eval block must compile.
+It doesn't catch syntax errors.
+
+die "xxx"; # xxx file# line#
+die "xxx/n" # xxx
+
+-------------------------------------------
+Introduction to References
+-------------------------------------------
+
+
