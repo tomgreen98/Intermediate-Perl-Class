@@ -129,5 +129,125 @@ die "xxx/n" # xxx
 -------------------------------------------
 Introduction to References
 -------------------------------------------
+my @last_three = pop_n(3, @foos);
 
+passed a n+1 item list 3, ?, ?, ?, ?, ...
 
+my @last_three = pop_n(3, \@foos);
+
+passes a 2 item list.  3, ref @foos
+
+PeGS...
+
+Write a Perl module to generate PeGS.
+
+$ref = \@count
+
+| ref >
+					| count >
+					===========
+|  * | ------------>     5
+                         4
+                         3
+                         2
+                         1
+
+A reference is just a scalar.
+
+sub pop_n {
+	my ($n, $array_ref) = @_;
+	...
+}
+
+$array_ref is just a "pointer" to the array.
+
+Daily WTF.
+
+printf "%${width}s\n";  # ahha here is the fix to $abc_abb where ${abc}_abb.
+
+@array = @{$array_ref};
+
+Its just about naming...
+
+sub pop_n {
+	my ($n, $array_ref) = @_;
+	my @items;
+
+	for (1..$n) {
+		my $item = pop @{ $array_ref };
+		unshift @items, $item;
+	}
+
+	@items; #return value.
+}
+
+# Test it now...
+my @foods = qw/ clam coconut fish /;
+my @last_3 = pop_n(3 \@foods);
+print "@foods\n";
+
+If you pass in 0 for $n?  1..0 => undef, returns @items -> undef.
+
+Additional ways to access an array:
+
+my $count = @{$array_ref};
+my $last = $#{$array_ref};
+my @two = @{$array_ref} [1, 2];
+
+Hash references:
+
+my $ref = \%file_size;
+
+${$ref}{item} = ???
+@{$ref}[0]
+
+Scalar references:
+
+How to make perl release memory?
+
+sub strip_span {
+	my $string_ref = shift;
+	$$string_ref =~ s/<\?span.*?>//s;
+}
+
+Passing a scalar by value creates a copy. Pass by reference is better for big data, think strings.
+
+You can compare references to see if they point to the same data.
+
+Modifying the array:
+
+my @gilligan = qw(red_shirt hat lucky_socks water_bottle);
+
+check_required_items("gilligan", \@gilligan);
+
+sub check_required_items {
+	my $who = shift;
+	my $items = shift;
+
+	my %items = map { $_, 1} @$items;
+	state @required = qw(preserver sunscreen water_botle jacket); # state requires 5.10. (similar to static, initialized the first time only.)
+
+	my @missing = ();
+
+	foreach my $item (@requried) {
+		unless (exists $items{$item}) {
+			print
+			push @missing, $item;
+		}
+	}
+
+	if (@missing) {
+		print "Adding @missing to @$items for $who.\n";
+		push @$items, @missing;
+	}
+}
+
+Defereferenceing with deeply nested structures gets very complicated.
+
+Prefer to use the -> to do the dereference.
+
+$all[2]->[1]->[0] = ${ ${ $all[2] } [1] }[0];
+
+also you can use:
+
+$all[2][1][0]
