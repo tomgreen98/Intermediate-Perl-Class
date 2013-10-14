@@ -17,5 +17,9 @@ while(<FILE>) {
 close FILE;
 
 foreach my $person (sort keys %{$wish_list}) {
-	print "$person: @{$wish_list->{$person}}\n";
+	local $, = ', ';
+	my @wl = @{$wish_list->{$person}};
+	print "$person: ";
+	print sort @wl;
+	print "\n";
 }
