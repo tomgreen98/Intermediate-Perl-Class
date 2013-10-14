@@ -362,3 +362,77 @@ Prototypical Checking
 if (ref $some eq ref [] ) { ... } # array ref
 if (ref $some eq ref {} ) { ... } # hash ref
 if (ref $some eq ref qr() ) { ... } # regex ref
+
+-----------------------
+Section 5: Manipulating Complex Data Structures
+-----------------------
+
+What is a good perl visual debugger?
+
+log for perl
+
+Debuggers:
+
+Devel::REPL
+Devel::hdb
+
+-------------------------------------------
+Printing a structured value for debugging
+-------------------------------------------
+Data::Dumper;
+
+------------------
+Add column names:
+------------------
+
+print Data::Dumper->Dump(
+	[ \%people, [ qw(a b c) ],
+	[ qw(*people *array)],
+)
+
+* means add the correct type.
+
+Data::Dump::Streamer - has fancier features.
+
+Data::Printer -
+
+p %hash;
+
+------------------
+YAML:
+------------------
+
+use YAML;
+print Dump( \%people, [qw(a b c)]);
+
+Now it outputs YAML...
+
+To get it back:
+
+use YAML;
+my ($people, $array) = Load( $string );
+
+YAML never evals so its safer...
+Its available in other languages
+There are other implementations:
+ * YAML::Tiny
+ * YAML::Syck
+
+Security issues:
+
+CGI::SpecFile
+
+	DESTROY {
+		unlink $$_[0];
+	}
+
+And Storable can be passed a string that can be iterpreted as this CGI::SpecFile class. Opps, you can unlink any file. YUCK.
+
+----------------------------
+Persistence with Storable
+----------------------------
+
+Sereal - Fixes all the known problems with Storable.
+
+
+
