@@ -251,3 +251,114 @@ $all[2]->[1]->[0] = ${ ${ $all[2] } [1] }[0];
 also you can use:
 
 $all[2][1][0]
+
+
+another way to build the hash:
+
+@names = qw(skipper, gilligan, professor);
+
+%all = map {
+	$_, \@{"$_"}
+} @names;
+
+#doesn't work in strict, there is another way too coming up.
+#don't do that...
+
+%main::  -> stash  - tracks all the stuff.
+
+foreach (keys %main::) {
+	next unless defined @{"$_"};
+	print "$_\n";
+}
+
+masteringperl.org -> new book by brian d foy.
+intermediateperl.com -> this book.
+
+How to use state actually?
+
+state $required = [preserver sunscreen water_bottle life_jacket];  # should work.
+
+--------------------------
+References and Scoping:
+--------------------------
+
+my $ref = \@count;
+
+my $ref2 = $ref;
+or
+my $ref2 = \@count;
+
+Just a new name for the same reference.
+
+When things go out of scope, the name dissapears, the data sticks around until all the references are released.
+
+sub get_personal_info {
+	local $_;
+	my $who = shift;
+
+	open (FILE, "clothing-size") or die "Can't open clithing-size file: $!";
+
+	chomp($_ = <FILE>);
+	my @headings = split /\t/;
+
+	while(<FILE>) {
+		chomp;
+		my @data = split /\t/;
+		next unless $data[0] eq $who;
+
+		my %hash;
+		@hash{@headings} = @data; # Hash slice assigns each data to each key
+
+		close FILE;
+
+		return \%hash;
+	}
+
+	close FILE;
+	();
+}
+
+HoA -> Hash of Arrays
+HoH -> Hash of Hashes
+
+>> perldsc
+
+----------------------
+Auto-vivification:
+----------------------
+
+my %total_bytes;
+while(<>) {
+	my ($source, $dest, $bytes) = split;
+	$total_bytes{$source}{$destination} += $bytes;
+}
+
+How to disable auto-vivication?
+
+use autovivification;
+ calls import();
+
+use x; =>  BEGIN {require x; x->import;}
+
+
+no autovivificaiton;
+
+no x; => BEGIN {require x; x->unimport;}
+
+---------------
+Destruction
+---------------
+Add a ref ++ refcount
+Remove a ref -- refcount
+Once the refcount is 0, perl may release the memory, may not be right a way....
+
+Can cause problems where structures cross reference each other.
+
+Stephen (Linked list in perl)
+
+-----------------------
+Prototypical Checking
+-----------------------
+if (ref $some eq ref [] ) { ... } # array ref
+if (ref $some eq ref {} ) { ... } # hash ref
+if (ref $some eq ref qr() ) { ... } # regex ref
