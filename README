@@ -681,3 +681,101 @@ Refernce to Regex
 
 my $regex = qr/Gill.*n/;  #Compiles
 
+
+ASSIDE: Shows the code that perl thinks it has
+perl -MO=Deparse -e '@$^R;';
+
+-----------------------
+Practical Ref Tricks
+-----------------------
+
+# Step 1, cache the file and size in array.
+my @files = glob "*";
+my @files_and_sizes = map [ $_, -s ], @files;
+
+# Sort by size
+my @sorted_refs = sort {
+	$b->[1] <=> $a->[1]
+} @ files_and_sizes;
+
+my @sorted_files = map $_->[0] @sorted_refs;
+
+--------------------------
+The Schwartzian Transform
+--------------------------
+Randel Schwartz
+
+my @sorted_files =
+	map $_->[0],
+	sort { $b->[1] <=> $a->[1] }
+	map [$_, -s],
+	glob "*";
+# Same results as above without all the intermediate variables
+
+----------------------------
+ Recursive Data Structures
+----------------------------
+
+$homedir = &gather("/home");
+
+sub gather {
+	my $dir = shift;
+
+	opendir GATHER, $dir or return;
+
+	my @kids = readdir GATHER;
+
+	my %self;
+
+	foreach my $kid (@kids) {
+		next if $kid eq "." or $kid eq "..";
+		$self{$kid} = &gather("$dir/$kid");
+	}
+
+	return \%self;
+}
+
+#works
+
+now lets play with the data structure:
+
+sub display {
+	my ($label, $node) = @_;
+	if (not $node) {
+		print "$label\n";
+	}
+
+	elsif (my @contents = keys %$node) {
+		print "$label, with contetns of:\n";
+
+		...
+	}
+	else {
+
+	}
+}
+
+#OK, but ugg.
+
+Some compilers can optimize this to remove the recursion... TelCall optimization not available in perl since we can redefine stuff (Dynamic Language)
+
+How do we convert this to an iterative solution?
+
+my @queue = ( ["/home", {}] );
+
+while( $e = shift @queue ) {
+	opendir /home
+	---> keys
+	push @queue [ $key, $e->[1]];
+}
+
+# Nice thing is we can push, unshift or insert so we can control depth first, breadth first or other.... we can skip things, we can trim at a certain depth...
+
+
+
+* Higher Order Perl
+
+
+
+
+
