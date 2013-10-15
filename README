@@ -434,5 +434,161 @@ Persistence with Storable
 
 Sereal - Fixes all the known problems with Storable.
 
+----------------------------
+Subroutine References
+----------------------------
+Reduce repetition.
+
+my $func_ref = \&func;
+
+&func_ref();
+&{$func_ref}();
+&$func_ref();
+$func_ref->(); # Added just before 5.04 released.
+
+All these call the same function the same way...
+
+Using multipe coderefs:
+
+foreach my $greet_ref (\&a_greet, \&b_greet, \&c_greet) {
+	$greet_ref->();
+}
+
+----------------------------
+Anonymous Subroutine:
+----------------------------
+my $func_ref = sub {
+	...
+}
+
+ASSIDE: (Cool use for state to get the loop counter.)
+@output_list = map {
+	state $n = 0;
+	say "on element", $n++;
+} @in;
+
+----------------------------
+Callbacks:
+----------------------------
+use File::Find;
+sub what_to_do {
+	print "$File::Find::name found.\n";
+}
+
+my @starting_points = qw{ . };
+
+find(\&what_to_do, @starting_points);
+
+There are several more variables:
+
+
+ASSIDE: find2perl -> creates a perl subroutine that works like the find linux call, but all native perl and often more efficent since doesn't pipe to output processing...
+
+----------------------------
+Lexical variables in a surrounding scope
+----------------------------
+
+use File::Find;
+
+my ($total_files, $total_bytes) = (0,0);
+
+find(
+	sub {
+		return if -l or not -f _; # Not a link or not a file
+		$total_files++;
+		$total_bytes += -s _;
+	},
+	"."
+);
+
+print "Total: $total_bytes bytes in $total_files files.\n";
+
+
+----------------------------
+Closures
+----------------------------
+
+my $callback;
+
+{
+	# In the private scope
+	my $count = 0;
+	$callback = sub {
+		# Creates a closure
+		print ++$count, ": $File::Find::name\n";
+		#$count has a refcount of 2
+	}
+}
+
+#$count has a refcount of 1, so its still around
+
+find ($callback, ".");
+
+The above can be implemented with state in modern 5.010+ without the extra scope block.
+
+---------------------------
+Return a closure
+---------------------------
+
+use File::Find;
+sub create_find_counter {
+	my $count = 0;
+	return sub {
+		print ++$count, ": $File::Find::name\n";
+	}
+}
+
+my $callback1 = create_find_counter();
+my $callback2 = create_find_counter();
+
+each have an independent count.
+
+
+--------------------------------
+Shared variables among closures
+--------------------------------
+
+use File::Find;
+
+sub find_callback_and_report() {
+
+	my ($total_files, $total_bytes) = (0,0);
+
+	my $calc = sub {
+		return if -l or not -f _; # Not a link or not a file
+		$total_files++;
+		$total_bytes += -s _;
+	};
+
+	my $report = sub {
+		print "Total: $total_bytes bytes in $total_files files.\n";
+	}
+);
+
+my ($calc, $report) = find_callback_and_report();
+
+find($calc, ".");
+find($calc, "./ab");
+find($calc, "./ac");
+$report->();
+
+-----------------------------
+File::Find::Closures
+-----------------------------
+
+-----------------------------
+state variables
+-----------------------------
+
+use 5.010; or use v5.10;
+
+-----------------------------
+END blocks
+-----------------------------
+BEGIN blocks execute top to  bottom
+END blocks execute bottom to top
+
+only run if running is normal, not for crashes.
+
 
 
