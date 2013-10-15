@@ -590,5 +590,94 @@ END blocks execute bottom to top
 
 only run if running is normal, not for crashes.
 
+Cool new feature in perl 6:
 
+$begin <= $m >= $end
+
+Can we port this???
+
+-------------------------------
+Filehandle and Regex References
+-------------------------------
+
+open my $fh, "..." or die "???: $!";
+while (<$fh>) {
+	print "One entry"
+}
+
+another way
+
+open my $fh, '>>', 'xxx.txt' or die "$!";
+
+print_to_this($fh);
+
+sub print_to_this {
+	my $fh = shift;
+	print $fh "Ayyy";
+}
+
+also:
+
+print {$fh} "xxx\n"; # helps clairify the distinction of a fh.
+
+the above are required if the file handle is stored in anything but the scalar.
+
+print {$array[0]}, "xxx\n";
+
+--------------------
+many files at once
+--------------------
+
+foreach my $file (glob "*.in") {
+	(my $out = $file) =~ s/\.in$/.out/;
+	open my $input...
+	open my $output...
+	push @handle_pairs, [$input, $output];
+}
+
+while (@handle_pairs) {
+	@handle_pairs = grep {
+		if (defined(my $line = readline($_->[0]))) {
+			print { $_->[1]} $line;
+		}
+		else {
+			0;
+		}
+	} @handle_pairs;
+}
+
+as the file handles go out of scope, they are automatically closed.
+This seems pretty obscure syntax for this process.
+
+---------------------
+Specialized handles
+---------------------
+
+---------------------
+File handles on scalars
+---------------------
+
+open my $fh, ">", \ my $string;
+print $fh "Foo";
+
+Books:
+* Effective Perl Programming
+* Network Programmin in Perl
+
+---------------------
+Regexs, old way
+---------------------
+my $what = 'Gill.*n';
+if (/$what/) {
+
+}
+
+These cost a lot since they are recompiled all the time.
+Better to compile once.
+
+---------------------
+Refernce to Regex
+---------------------
+
+my $regex = qr/Gill.*n/;  #Compiles
 
