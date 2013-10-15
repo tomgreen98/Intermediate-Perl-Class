@@ -772,6 +772,62 @@ while( $e = shift @queue ) {
 # Nice thing is we can push, unshift or insert so we can control depth first, breadth first or other.... we can skip things, we can trim at a certain depth...
 
 
+www.perlmonks.org/?node_id=393128
+
+playing with dumbbench
+http://www.masteringperl.org/2013/02/playing-with-dumbbench/
+
+-----------------------------
+Libraries and Packages
+-----------------------------
+
+require - loads a file, checked its cache first, if it doesn't work, it dies.
+looks for a true value for the last statement to be true.
+
+1; # at the end of the file
+
+How to find the library?
+
+* Full path.
+* Partial path from root. (Searches @INC list)
+*
+
+perl -V - shows all the global variables
+
+ways to change the @INC list:
+
+setenv PERL5LIB ...
+PERL5LIB=...; export PERL5LIB;
+perl -I "path"
+
+----------------------------
+Namespace collision
+----------------------------
+last definition wins.
+
+with perl 5 adds packages.
+
+----------------------------
+Declaring shared package variables??? (old way)
+----------------------------
+package a;
+use vars qw/ @labels @sizes @garmennts /;
+
+----------------------------
+Declaring shared package variables??? (new way)
+----------------------------
+package a;
+our ($a, $b, $c);
+
+How to get the package information.
+
+$package=__PACKAGE__;
+($package, $file, $line) = caller(o);
+
+
+
+
+
 
 * Higher Order Perl
 
