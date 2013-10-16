@@ -78,7 +78,12 @@ use warnings;
 my @yard = qw (Cow Cow Horse Sheep Mouse Cow Cow Lizard);
 
 while (<>) {
-	push @yard, $_;
+	chomp ($_);
+	if ($_ ne '') {
+		push @yard, $_;
+	} else {
+		last;
+	}
 }
 
 {

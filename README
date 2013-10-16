@@ -908,7 +908,7 @@ Same process is used for the sound() method called by speak().
 2) Look in each class defined in @ISA.
 
 ------------------
-Specializaition
+Specialization
 ------------------
 
 {
@@ -923,6 +923,156 @@ Specializaition
 	}
 }
 
+-------------------
+Bless
+-------------------
+Turns a reference into an object.
+
+my $name = "Mr. Ed";
+my $talking = \$name;
+bless $talking, "Horse";
+
+$talking is a Horse now...
+
+print $talking->speak(), "\n";
+
+results in:
+
+Horse->speak($talking);
+
+-------------------
+
+{
+	package Horse;
+	sub name {
+		my $self = shift;
+		$$self;
+	}
+}
+
+
+--------------------
+Constructors
+--------------------
+Name of constructor can be anything. More like a factory method.
+
+{
+	package Horse;
+
+	sub named {
+		# Im the constructor...
+		my $class = shift;
+		my $name = shift;
+		bless \$name, $class;
+	}
+}
+
+my $talking = Horse->named("Mr. Ed");
+print $talking->name, " says ", $talking->sound, "!\n";
+
+>> Mr. Ed says neigh!
+
+Raymond Shen (Microsoft win32 guy)
+
+---------------------
+
+{
+	package Animal;
+
+	sub speak {
+		my $either = shift; # Class or Instance
+		print $either->name, " says ", $either->sound, "!\n"
+	}
+
+	sub name {
+		my $either = shift;
+		ref $either ? $$either : "Unnamed";
+	}
+}
+
+-----------------------
+
+now lets make them eat.
+
+{
+	pacakge Animal;
+
+	sub eat {
+		my $either = shift;
+		my $food = shift;
+
+		print $either->name, " eats $food. \n";
+	}
+}
+
+my $talking = Horse->named("Mr. Ed");
+$talking->eat("hay");
+Cow->eat("grass");
+
+-------------------------
+More interesting classes
+-------------------------
+
+my $lost = bless {
+	Name => "Babes",
+	Color => "white",
+}
+
+{
+	package Animal;
+
+	sub named {
+		my $class = shift;
+		my $name = shift;
+		my $self = {
+			Name => $name,
+			Color => $class->default_color
+		};
+
+		bless $self, $class;
+	}
+
+	sub name {
+		my $either = shift;
+		ref $either ? $either->{Name} : "unnamed $either";
+	}
+
+	sub default_color {
+		"brown";
+	}
+
+	sub color {
+		# Getter/Setter
+		my $self = shift;
+		if (@_) {
+			$self->{Color} = shift;
+		}
+		else {
+			$self->{Color};
+		}
+	}
+}
+
+Some things should only work with the class and some only with the color.
+
+sub class_only {
+	if (ref (my $class = shift) {
+		die "class name needed";
+	})
+}
+
+another way:
+
+use Carp qw(croak);
+
+sub class_only {
+	my $class = shift;
+	croak "class name needed" if ref $class; # give you the caller
+}
+
+carp - returns in function context
+confess - like croak with stack trace
+cluck - like carp with stack trace
 
 
 

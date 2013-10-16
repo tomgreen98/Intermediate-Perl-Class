@@ -122,6 +122,7 @@ use warnings;
 my @yard = qw (Plant Plant Cow Person Cow Horse Sheep Mouse Cow Cow Lizard Person Cow);
 
 while (<>) {
+	chomp ($_);
 	push @yard, $_;
 }
 
