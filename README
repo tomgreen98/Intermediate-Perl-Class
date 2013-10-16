@@ -1075,6 +1075,80 @@ confess - like croak with stack trace
 cluck - like carp with stack trace
 
 
+---------------------
+Destructors
+---------------------
+
+sub DESTROY {
+
+}
+
+Weird other way to write perl:
+
+print STDOUT "Hello"; # indirect object notation.
+STDOUT->print("Hello");
+
+Generally we don't want to use indirect object notation.
+
+----------------------
+Class variables -> Like static
+----------------------
+
+{
+	package Animal;
+
+	our %REGISTRY;
+
+	sub factory {
+		my $class = shift;
+		my $name = shift;
+
+		my $self = {
+			'name' => $name,
+			'color' => $class->default_color(),
+		};
+
+		$REGISTRY{$self} = bless $self, $class;
+	}
+
+	sub registry_report {
+
+	}
+}
+
+Animals can't die since there is always a ref in the REGISTRY.
+
+One way to solve this is to use Weakening.
+
+{
+	package Animal;
+
+	our %REGISTRY;
+
+	sub factory {
+		my $class = shift;
+		my $name = shift;
+
+		my $self = {
+			'name' => $name,
+			'color' => $class->default_color(),
+		};
+
+		$REGISTRY{$self} = bless $self, $class;
+		weaken($REGISTRY{$self}); #dec ref count
+	}
+
+	sub DESTROY {
+
+	}
+
+	sub registry_report {
+
+	}
+}
+
+
+
 
 * Higher Order Perl
 
