@@ -824,7 +824,104 @@ How to get the package information.
 $package=__PACKAGE__;
 ($package, $file, $line) = caller(o);
 
+-----------------------
+Object Oriented Perl
+-----------------------
+sub Cow::speak {};
+sub Horse::speak {};
+sub Sheep::speak {};
 
+my @pasture = qw(Cow Cow Horse Sheep Sheep);
+foreach my $beast (@pasture) {
+	&{ $beast . "::speak"};
+}
+
+# doesnt work in strict
+
+my @pasture = qw(Cow Cow Horse Sheep Sheep);
+foreach my $beast (@pasture) {
+	$beast->speak();
+}
+
+# this is strict safe
+
+--------------------------
+
+Class->method(@args)  =>  Class::method("Class", @args)
+
+--------------------------
+
+{
+	package Cow;
+	sub sound { "moooo" };
+	sub speak {
+		my $class = shift;
+		print "a $class goes", $class->sound, "!\n";
+	}
+}
+
+{
+	package Sheep;
+	...
+}
+
+{
+	package Horse;
+	....
+}
+
+---------------------
+
+the speak sub routine is now generic.
+
+{
+	package Animal;
+	sub speak {
+		my $class = shift;
+		print "a $class goes", $class->sound, "!\n";
+	}
+}
+
+{
+	package Cow;
+	@ISA = qw(Animal); # Parent class
+	sub sound { "moooooo" };
+}
+
+# Pretty simple.
+
+How does it work?
+
+Cow->speak
+
+Cow::speak ??? no
+
+Looks in parent packages
+
+Animal::speak ??? yes
+
+&Animal::speak("Cow", @args);
+
+Same process is used for the sound() method called by speak().
+
+1) Look in current package
+2) Look in each class defined in @ISA.
+
+------------------
+Specializaition
+------------------
+
+{
+	package Mouse;
+	@ISA = qw(Animal);
+
+	sub sound { "squeak" };
+	sub speak {
+		my $class = shift;
+		$class->SUPER::speak; # Calls the parent class
+		print "[but you can barely hear it!]\n";
+	}
+}
 
 
 
