@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Oogaboogo-Locale.t
+lib/Oogaboogo/Locale.pm
