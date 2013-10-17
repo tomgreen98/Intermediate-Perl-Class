@@ -1147,6 +1147,157 @@ One way to solve this is to use Weakening.
 	}
 }
 
+---------------------
+Universal Methods
+---------------------
+
+Like the root object of all other objects.
+
+UNIVERSAL::isa("???"); # only works on blessed objects
+
+grep eval { $_->isa() }; # tests if the $_ is blessed
+
+UNIVERSAL::can("eat"); # does the class implement the eat method.
+
+if (eval { $thing->can("eat")} ) {
+	$thing->eat("hay and oats");
+}
+
+
+-----------------------
+AUTOLOAD
+-----------------------
+sub AUTOLOAD {
+	our AUTOLOAD;
+
+	(my $method = $AUTOLOAD) =~ s/.*:://;
+
+	if ($method eq "vaccinate") {
+		# create the methods
+	}
+	else {
+		???
+	}
+}
+
+AutoLoader was popular for a while, but has gone out of favor, perhape because computers have gotten so much faster.
+
+If you see:
+
+Can't find method foo.a1
+
+SelfLoader also not used anymore.
+
+loads optional methods dynamically only when needed.
+put optional methods below __DATA__
+
+--------------------
+multiple inheritance
+--------------------
+
+{
+	package RaceHorse;
+
+	our @ISA = qw ( Horse Racer );
+}
+
+Order of classes gets complicated though for fall through methods.
+Process stack for first ISA, followed by second ISA, followed...
+
+mro - perl 5.010; # method resolution order
+
+---------------------
+modules
+---------------------
+
+# Function oriented interface
+use File::Basename ("fileparse", "basename");
+use File::Basename qw(fileparse basename);
+
+File::Basename::dirname(); # fully resolved
+
+use File::Basename();  # dont import anything.
+use File::Basename;    # import the defaults.
+
+# Object oriented interface
+use File::Spec;
+my $filespec = File::Spec->catfile($homedir, 'web_docs', "photos", "pic.gif");
+
+# generates /home/abc/web_docs/photos/pic.gif
+
+
+-------------------------
+
+use Island::Plotting::Maps qw( a b c d );
+
+results in:
+
+BEGIN {
+	require Island::Plotting::Maps;
+	Island::Plotting::Maps->import( qw ( a b c d) );
+}
+
+results in:
+
+
+BEGIN {
+	require "Island/Plotting/Maps.pm;
+	Island::Plotting::Maps->import( qw ( a b c d) );
+}
+
+To define this module:
+
+package Island::Plotting::Maps;
+
+sub a {}
+sub b {}
+sub c {}
+sub d {}
+
+1;
+
+---------------------------
+use
+---------------------------
+
+use lib "/home/ab/lib"; -> BEGIN { unshift @INC, "/home/ab/lib"};
+
+#use use lib preferably...
+
+---------------------------
+Importing with Exporter
+---------------------------
+
+package Island::Plotting::Maps;
+
+our @EXPORT = qw( a b c d); # defaults
+our @EXPORT_OK = qw( e f ); # allowed to be exported, but not by default
+use Exporter;
+our @ISA = qw(Exporter);
+
+sub a {}
+sub b {}
+sub c {}
+sub d {}
+
+sub e {}
+sub f {}
+
+1;
+
+For an OO model its different
+
+package My::OOModule::Base;
+
+our @EXPORT = ();
+use Exporter;
+our @ISA = qw(Exporter);
+
+or
+
+package My::OOModule::Base;
+use base qw( Exporter ); #5.010 >
+
 
 
 
