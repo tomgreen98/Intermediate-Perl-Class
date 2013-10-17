@@ -1463,6 +1463,40 @@ Distribute your stuff
 
 make dist -> *.tar.gz
 
+----------------------
+Testing
+----------------------
+
+Curtis 'Ovid' Poe - Big testing guy. Also helps people get jobs in Europe.
+
+use_ok($class) or print "BAILOUT!...";
+
+00.load.t
+
+use_ok($class) or print "BAILOUT!...";
+use_ok($class) or print "BAILOUT!...";
+use_ok($class) or print "BAILOUT!...";
+use_ok($class) or print "BAILOUT!...";
+
+in newer version:
+
+BAILOUT(); method
+
+When starting off:
+-----------------------
+
+use Test::More tests => big number...
+
+or
+
+use Test::More;
+
+done_testing();
+
+or
+
+use Test::More 'no_plan';
+
 
 
 

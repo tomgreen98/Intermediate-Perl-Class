@@ -1,0 +1,6 @@
+Revision history for Perl extension My::List::Util.
+
+0.01  Thu Oct 17 12:53:51 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn My::List::Util
+
